@@ -19,10 +19,12 @@ import {
   mergeMultipartFiles,
 } from "./archive.js";
 import type {
+  CheckDownloadCapacityInput,
   DatasetDownloadAccessResult,
   DatasetFile,
   DatasetFileInventory,
   DatasetFilePage,
+  DownloadCapacityResult,
   DownloadDatasetFilesInput,
   DownloadDatasetFilesResult,
 } from "./types.js";
@@ -30,10 +32,19 @@ import type {
 const MIN_DISK_MARGIN = 64 * 1024 * 1024;
 const MAX_RETURNED_PATHS = 200;
 
+export interface DiskSpaceSnapshot {
+  filesystemPath: string;
+  availableBytes: number;
+}
+
+type DiskSpaceInspector = (destination: string) => Promise<DiskSpaceSnapshot>;
+
 export class DatasetDownloader {
   constructor(
     private readonly metadataClient: AihubMetadataClient,
     private readonly downloadClient: AihubDownloadClient,
+    private readonly diskSpaceInspector: DiskSpaceInspector =
+      inspectAvailableDiskSpace,
   ) {}
 
   async listFiles(
@@ -68,6 +79,52 @@ export class DatasetDownloader {
       totalSizeBytes,
       limit: options.limit,
       offset: options.offset,
+    };
+  }
+
+  async checkCapacity(
+    input: CheckDownloadCapacityInput,
+  ): Promise<DownloadCapacityResult> {
+    const inventory = await this.requireInventory(input.datasetId);
+    const files =
+      input.fileIds === undefined
+        ? inventory.files
+        : selectFiles(inventory, input.fileIds);
+    const destination = validateDestination(input.destination);
+    const [disk, destinationExists] = await Promise.all([
+      this.diskSpaceInspector(destination),
+      pathExists(destination),
+    ]);
+    const downloadBytes = sumSizes(files);
+    const minimumFreeBytes = minimumRequiredBytes(downloadBytes);
+    const recommendedFreeBytes = recommendedRequiredBytes(downloadBytes);
+    const minimumShortfallBytes = Math.max(
+      0,
+      minimumFreeBytes - disk.availableBytes,
+    );
+    const recommendedShortfallBytes = Math.max(
+      0,
+      recommendedFreeBytes - disk.availableBytes,
+    );
+
+    return {
+      datasetId: inventory.datasetId,
+      datasetName: inventory.datasetName,
+      datasetUrl: inventory.datasetUrl,
+      scope: input.fileIds === undefined ? "all" : "selected",
+      fileCount: files.length,
+      totalFileCount: inventory.files.length,
+      downloadBytes,
+      minimumFreeBytes,
+      recommendedFreeBytes,
+      availableBytes: disk.availableBytes,
+      minimumShortfallBytes,
+      recommendedShortfallBytes,
+      minimumFits: minimumShortfallBytes === 0,
+      recommendedFits: recommendedShortfallBytes === 0,
+      destination,
+      destinationExists,
+      filesystemPath: disk.filesystemPath,
     };
   }
 
@@ -271,14 +328,71 @@ async function ensureDiskSpace(parent: string, expectedBytes: number): Promise<v
     return;
   }
 
-  const required =
-    expectedBytes * 2 + Math.max(MIN_DISK_MARGIN, Math.ceil(expectedBytes * 0.1));
+  const required = minimumRequiredBytes(expectedBytes);
   if (available < required) {
     throw new AihubError(
       "AIHUB_INSUFFICIENT_DISK",
       `다운로드와 안전한 압축 해제에 필요한 여유 공간이 부족합니다. 최소 ${required}바이트가 필요합니다.`,
     );
   }
+}
+
+export async function inspectAvailableDiskSpace(
+  destination: string,
+): Promise<DiskSpaceSnapshot> {
+  let candidate = dirname(validateDestination(destination));
+
+  while (true) {
+    try {
+      const stats = await statfs(candidate);
+      const availableBytes = stats.bavail * stats.bsize;
+      if (!Number.isSafeInteger(availableBytes) || availableBytes < 0) {
+        throw new AihubError(
+          "AIHUB_INVALID_DESTINATION",
+          "대상 파일시스템의 여유 공간을 안전하게 계산할 수 없습니다.",
+        );
+      }
+      return {
+        filesystemPath: candidate,
+        availableBytes,
+      };
+    } catch (error) {
+      if (error instanceof AihubError) {
+        throw error;
+      }
+      const parent = dirname(candidate);
+      if (parent === candidate) {
+        throw new AihubError(
+          "AIHUB_INVALID_DESTINATION",
+          `다운로드 대상 드라이브의 여유 공간을 확인할 수 없습니다: ${destination}`,
+        );
+      }
+      candidate = parent;
+    }
+  }
+}
+
+async function pathExists(path: string): Promise<boolean> {
+  try {
+    await access(path);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export function minimumRequiredBytes(downloadBytes: number): number {
+  return (
+    downloadBytes * 2 +
+    Math.max(MIN_DISK_MARGIN, Math.ceil(downloadBytes * 0.1))
+  );
+}
+
+export function recommendedRequiredBytes(downloadBytes: number): number {
+  return (
+    downloadBytes * 3 +
+    Math.max(MIN_DISK_MARGIN, Math.ceil(downloadBytes * 0.1))
+  );
 }
 
 function readContentLength(response: Response): number | null {

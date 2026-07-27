@@ -56,6 +56,16 @@ Status: implemented.
 - lightweight samples are used only after an explicit sample request;
 - dataset URLs are interpreted through their `dataSetSn` identifier.
 
+## Milestone 0.5 — capacity-first planning
+
+Status: implemented.
+
+- `check_download_capacity` for all inventory files or selected file keys;
+- exact API inventory byte totals instead of relying on approximate page sizes;
+- prospective destination filesystem and current free-space inspection;
+- hard minimum, recommended space, and shortfall reporting;
+- capacity check before file selection and again before the final download.
+
 ## Milestone 1.0 — public release
 
 - validate behavior with approved real-data access outside the default test suite;

@@ -1,4 +1,4 @@
 interface:
   display_name: "AI Hub"
-  short_description: "AI Hub 승인 확인·데이터 검색·선택 다운로드"
-  default_prompt: "Use $aihub to verify AI Hub download approval before preparing a dataset for model training."
+  short_description: "AI Hub 승인·데이터 크기·디스크 용량 사전 확인"
+  default_prompt: "Use $aihub to verify download approval and disk capacity before preparing an AI Hub dataset."

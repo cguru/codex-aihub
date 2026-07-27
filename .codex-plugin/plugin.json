@@ -1,7 +1,7 @@
 {
   "name": "codex-aihub",
-  "version": "0.4.0",
-  "description": "Codex에서 AI Hub 다운로드 승인을 확인하고 선택한 데이터 파일을 안전하게 받습니다.",
+  "version": "0.5.0",
+  "description": "Codex에서 AI Hub 승인과 디스크 용량을 확인하고 선택한 데이터 파일을 안전하게 받습니다.",
   "homepage": "https://github.com/cguru/codex-aihub#readme",
   "repository": "https://github.com/cguru/codex-aihub",
   "author": {
@@ -17,8 +17,8 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "AI Hub for Codex",
-    "shortDescription": "AI Hub 승인 확인·데이터 검색·안전한 다운로드",
-    "longDescription": "로컬 Node.js MCP 서버를 통해 AI Hub 데이터셋의 정식 다운로드 승인을 먼저 확인하고, 파일 키와 용량을 살핀 뒤 승인된 파일만 안전하게 다운로드합니다. 경량 샘플은 사용자가 명시적으로 요청할 때만 사용하며 개인 API 키는 로컬 환경변수에만 보관됩니다.",
+    "shortDescription": "AI Hub 승인·데이터 크기·디스크 용량 사전 확인",
+    "longDescription": "로컬 Node.js MCP 서버를 통해 AI Hub 데이터셋의 정식 다운로드 승인을 먼저 확인하고, 정확한 파일 용량과 대상 드라이브의 여유 공간을 비교한 뒤 승인된 파일만 안전하게 다운로드합니다. 경량 샘플은 사용자가 명시적으로 요청할 때만 사용하며 개인 API 키는 로컬 환경변수에만 보관됩니다.",
     "developerName": "codex-aihub contributors",
     "websiteURL": "https://github.com/cguru/codex-aihub",
     "category": "Productivity",
@@ -28,6 +28,7 @@
     ],
     "defaultPrompt": [
       "이 AI Hub 데이터셋을 받을 수 있는지 먼저 확인해줘.",
+      "전체 데이터 크기와 이 드라이브에 필요한 여유 공간을 확인해줘.",
       "이 데이터셋의 가장 작은 파일부터 보여줘.",
       "선택한 AI Hub 파일을 작업 폴더에 다운로드해줘.",
       "이 데이터셋의 경량 샘플만 받아줘."

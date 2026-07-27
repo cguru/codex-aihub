@@ -31,6 +31,13 @@ const accessCheckAnnotations = {
   openWorldHint: true,
 } as const;
 
+const capacityAnnotations = {
+  readOnlyHint: true,
+  destructiveHint: false,
+  idempotentHint: true,
+  openWorldHint: false,
+} as const;
+
 export function registerDownloadTools(
   server: McpServer,
   downloader: DatasetDownloader,
@@ -65,6 +72,70 @@ export function registerDownloadTools(
           message:
             "정식 API 데이터 다운로드 승인이 확인되었습니다. " +
             "승인 확인 과정에서는 파일을 저장하지 않았습니다.",
+        };
+      }),
+  );
+
+  server.registerTool(
+    "check_download_capacity",
+    {
+      title: "Check AI Hub download capacity",
+      description:
+        "Compare the exact AI Hub API file inventory size with free space on the filesystem that will contain a prospective absolute destination. Omit file_ids to estimate the entire dataset without selecting it for download, or pass exact file IDs to check a selected subset. Returns the hard minimum used by the safe downloader and a larger recommendation for later ZIP extraction and work products. Call after full-data download approval is confirmed and again after exact files are selected. This tool writes nothing.",
+      inputSchema: {
+        dataset_id: z
+          .number()
+          .int()
+          .positive()
+          .describe("AI Hub dataSetSn identifier."),
+        file_ids: z
+          .array(z.number().int().positive())
+          .min(1)
+          .max(200)
+          .optional()
+          .describe(
+            "Optional exact fileSn values. Omit only to estimate the full dataset; omission never authorizes a full download.",
+          ),
+        destination: z
+          .string()
+          .trim()
+          .min(1)
+          .max(2_048)
+          .describe(
+            "Prospective absolute destination directory whose containing filesystem should be checked. Nothing is created.",
+          ),
+      },
+      outputSchema: {
+        datasetId: z.number().int().positive(),
+        datasetName: z.string().nullable(),
+        datasetUrl: z.string().url(),
+        scope: z.enum(["all", "selected"]),
+        fileCount: z.number().int().nonnegative(),
+        totalFileCount: z.number().int().nonnegative(),
+        downloadBytes: z.number().int().nonnegative(),
+        minimumFreeBytes: z.number().int().nonnegative(),
+        recommendedFreeBytes: z.number().int().nonnegative(),
+        availableBytes: z.number().int().nonnegative(),
+        minimumShortfallBytes: z.number().int().nonnegative(),
+        recommendedShortfallBytes: z.number().int().nonnegative(),
+        minimumFits: z.boolean(),
+        recommendedFits: z.boolean(),
+        destination: z.string(),
+        destinationExists: z.boolean(),
+        filesystemPath: z.string(),
+      },
+      annotations: capacityAnnotations,
+    },
+    async ({ dataset_id: datasetId, file_ids: fileIds, destination }) =>
+      runTool(async () => {
+        const result = await downloader.checkCapacity({
+          datasetId,
+          fileIds,
+          destination,
+        });
+        return {
+          data: result,
+          message: capacityMessage(result),
         };
       }),
   );
@@ -192,6 +263,55 @@ export function registerDownloadTools(
             `완성된 파일은 ${result.extractedFileCount}개입니다.`,
         };
       }),
+  );
+}
+
+function capacityMessage(result: {
+  downloadBytes: number;
+  minimumFreeBytes: number;
+  recommendedFreeBytes: number;
+  availableBytes: number;
+  minimumShortfallBytes: number;
+  minimumFits: boolean;
+  recommendedFits: boolean;
+  destinationExists: boolean;
+}): string {
+  const prefix =
+    `예상 다운로드 ${formatBytes(result.downloadBytes)}, ` +
+    `최소 여유 공간 ${formatBytes(result.minimumFreeBytes)}, ` +
+    `권장 여유 공간 ${formatBytes(result.recommendedFreeBytes)}, ` +
+    `현재 사용 가능 ${formatBytes(result.availableBytes)}입니다. `;
+  const existing = result.destinationExists
+    ? "지정한 목적 경로가 이미 있어 실제 다운로드에는 새 경로가 필요합니다. "
+    : "";
+
+  if (!result.minimumFits) {
+    return (
+      prefix +
+      existing +
+      `최소 공간이 ${formatBytes(result.minimumShortfallBytes)} 부족하므로 이 대상으로는 다운로드할 수 없습니다.`
+    );
+  }
+  if (!result.recommendedFits) {
+    return (
+      prefix +
+      existing +
+      "안전 다운로드의 최소 조건은 충족하지만 ZIP 해제와 학습 산출물을 위한 권장 공간은 부족합니다."
+    );
+  }
+  return prefix + existing + "다운로드와 후속 작업을 위한 권장 공간을 충족합니다.";
+}
+
+function formatBytes(bytes: number): string {
+  if (bytes < 1_000_000_000) {
+    return `${(bytes / 1_000_000).toFixed(2)} MB`;
+  }
+  if (bytes < 1_000_000_000_000) {
+    return `${(bytes / 1_000_000_000).toFixed(2)} GB`;
+  }
+  return (
+    `${(bytes / 1_000_000_000_000).toFixed(2)} TB` +
+    ` (${(bytes / 1_099_511_627_776).toFixed(2)} TiB)`
   );
 }
 

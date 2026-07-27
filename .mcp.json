@@ -2,7 +2,7 @@
   "mcpServers": {
     "aihub": {
       "title": "AI Hub",
-      "description": "Search AI Hub datasets and safely download selected approved files.",
+      "description": "Search AI Hub datasets, check approval and disk capacity, and safely download selected files.",
       "cwd": ".",
       "command": "node",
       "args": [

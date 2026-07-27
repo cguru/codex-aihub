@@ -1,6 +1,6 @@
 ---
 name: aihub
-description: Search, inspect, authorize, select, and download AI Hub datasets for analysis or model-building workflows. Use when a user supplies an AI Hub dataset URL or identifier, asks to download AI Hub data, build a model or program from it, inspect downloadable files, or explicitly requests lightweight sample data.
+description: Search, inspect, authorize, size, select, and download AI Hub datasets for analysis or model-building workflows. Use when a user supplies an AI Hub dataset URL or identifier, asks to download AI Hub data, check dataset or disk size, build a model or program from it, inspect downloadable files, or explicitly requests lightweight sample data.
 ---
 
 # AI Hub
@@ -23,12 +23,16 @@ Use the bundled tools to discover data, verify full-data access, inspect exact f
 
    Include the returned dataset URL, then stop. Do not download a sample, propose a sample fallback, or create the requested training/evaluation/inference program.
 3. If the API key is missing, direct the user to the official issuance page and stop until the key is configured.
-4. After approval is confirmed, call `list_dataset_files` and report the selected names, file keys, exact sizes, total size, destination, and dataset URL.
-5. Never select every file by default. Choose only files needed for the requested task, and obtain clarification when the correct training/validation/test set cannot be determined safely.
-6. Treat an explicit download request for resolved files as sufficient intent. Pass a new absolute destination directory to `download_dataset_files`; never overwrite an existing path.
-7. Start training, evaluation, or inference implementation only after the required files have downloaded successfully and their contents have been verified.
+4. After approval is confirmed, resolve a prospective new absolute destination in the user's workspace or use the user's supplied destination. Call `check_download_capacity` without `file_ids` to compare the exact full inventory with that filesystem. Report exact bytes, decimal TB/GB, binary TiB/GiB, hard minimum, recommendation, available space, and shortfall. Omitting `file_ids` estimates all files but never authorizes a full download.
+5. If the full dataset does not fit, say so before file selection. Do not attempt a full download. Offer to identify the smallest task-sufficient subset or ask for a different drive.
+6. Call `list_dataset_files` and report the selected names, file keys, exact sizes, total size, destination, and dataset URL.
+7. Never select every file by default. Choose only files needed for the requested task, and obtain clarification when the correct paired training/validation source and label files cannot be determined safely.
+8. Call `check_download_capacity` again with the exact selected `file_ids`. Stop when `minimumFits` is false. When only `recommendedFits` is false, warn that later ZIP extraction and training outputs may not fit and obtain confirmation or another destination.
+9. Treat an explicit download request for resolved files as sufficient intent. Pass the same new absolute destination directory to `download_dataset_files`; never overwrite an existing path.
+10. Start training, evaluation, or inference implementation only after the required files have downloaded successfully and their contents have been verified.
 
 The access check opens the smallest full-data API response only long enough to verify authorization, cancels it immediately, and saves no dataset file.
+Use the API file inventory sum as the exact downloadable size. Treat sizes printed on the AI Hub page as approximate when they differ.
 
 ## Handle an explicit sample request
 
@@ -49,6 +53,7 @@ If browser control is unavailable, give the dataset URL and ask the user to down
 - Call `get_dataset` when the user provides a dataset identifier or asks for complete details about a resolved dataset.
 - Call `get_datasets_with_guide` to find datasets whose manual or construction/use guide can be read as Markdown.
 - Call `check_dataset_download_access` first for every full-data download or downstream build request.
+- Call `check_download_capacity` after approval for the full inventory and again for exact selected files.
 - Call `list_dataset_files` after approval is confirmed to resolve exact file keys and byte sizes. Prefer `size_asc` for exploration.
 - Call `download_dataset_files` only for explicitly selected file keys and a new absolute destination path.
 
@@ -57,6 +62,7 @@ If browser control is unavailable, give the dataset URL and ask the user to down
 - State the full match count and the number shown when a search returns a page.
 - Include each relevant AI Hub dataset URL.
 - Show human-readable sizes alongside exact byte counts.
+- Distinguish decimal TB/GB from binary TiB/GiB and clearly label page estimates versus API inventory totals.
 - Preserve uncertainty when a field is absent or the upstream response has changed.
 - Explain that this is an unofficial community integration when affiliation could be misunderstood.
 

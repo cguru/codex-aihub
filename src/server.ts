@@ -13,11 +13,11 @@ export function createAihubServer(): McpServer {
   const server = new McpServer(
     {
       name: "codex-aihub",
-      version: "0.4.0",
+      version: "0.5.0",
     },
     {
       instructions:
-        "Search, inspect, and explicitly download selected AI Hub dataset files. When a user supplies a dataset URL or identifier and asks to download data or build from it, check full API download access before listing, downloading, or starting downstream model work. If access is not approved, stop and tell the user to apply on AI Hub. Never substitute lightweight sample data unless the user explicitly asks for a sample. Keep each dataset's AI Hub URL in user-facing results. Read the personal AIHUB_API_KEY only from the local environment and never request or expose it in chat, results, URLs, or logs. List exact file keys and sizes before downloading, never download every file by default, and call the download tool only after the user explicitly requests a resolved download.",
+        "Search, inspect, and explicitly download selected AI Hub dataset files. When a user supplies a dataset URL or identifier and asks to download data or build from it, check full API download access before listing, downloading, or starting downstream model work. If access is not approved, stop and tell the user to apply on AI Hub. After approval, compare exact inventory bytes and selected-file bytes with free space on the intended destination filesystem before downloading, and clearly report minimum, recommended, available, and shortfall sizes. Never substitute lightweight sample data unless the user explicitly asks for a sample. Keep each dataset's AI Hub URL in user-facing results. Read the personal AIHUB_API_KEY only from the local environment and never request or expose it in chat, results, URLs, or logs. List exact file keys and sizes before downloading, never download every file by default, and call the download tool only after the user explicitly requests a resolved download.",
     },
   );
 

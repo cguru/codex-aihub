@@ -23,6 +23,84 @@ afterEach(async () => {
 });
 
 describe("DatasetDownloader", () => {
+  it("compares the full inventory with prospective disk space without writing", async () => {
+    const config = fakeConfig();
+    const metadataClient = new AihubMetadataClient({
+      config: () => config,
+      fetchImpl: vi.fn(async () => metadataResponse()) as unknown as typeof fetch,
+    });
+    const downloadClient = new AihubDownloadClient({
+      config: () => config,
+      fetchImpl: vi.fn() as unknown as typeof fetch,
+    });
+    const diskInspector = vi.fn(async () => ({
+      filesystemPath: "C:\\",
+      availableBytes: 10,
+    }));
+    const downloader = new DatasetDownloader(
+      metadataClient,
+      downloadClient,
+      diskInspector,
+    );
+
+    const result = await downloader.checkCapacity({
+      datasetId: 123,
+      destination: "C:\\aihub\\dataset-123",
+    });
+
+    expect(result).toMatchObject({
+      scope: "all",
+      fileCount: 2,
+      totalFileCount: 2,
+      downloadBytes: 4,
+      minimumFreeBytes: 67_108_872,
+      recommendedFreeBytes: 67_108_876,
+      availableBytes: 10,
+      minimumShortfallBytes: 67_108_862,
+      minimumFits: false,
+      recommendedFits: false,
+      destinationExists: false,
+      filesystemPath: "C:\\",
+    });
+    expect(diskInspector).toHaveBeenCalledWith("C:\\aihub\\dataset-123");
+  });
+
+  it("checks only explicitly selected files when file IDs are supplied", async () => {
+    const config = fakeConfig();
+    const metadataClient = new AihubMetadataClient({
+      config: () => config,
+      fetchImpl: vi.fn(async () => metadataResponse()) as unknown as typeof fetch,
+    });
+    const downloadClient = new AihubDownloadClient({
+      config: () => config,
+      fetchImpl: vi.fn() as unknown as typeof fetch,
+    });
+    const downloader = new DatasetDownloader(
+      metadataClient,
+      downloadClient,
+      async () => ({
+        filesystemPath: "D:\\",
+        availableBytes: 100_000_000,
+      }),
+    );
+
+    const result = await downloader.checkCapacity({
+      datasetId: 123,
+      fileIds: [456],
+      destination: "D:\\aihub\\selected",
+    });
+
+    expect(result).toMatchObject({
+      scope: "selected",
+      fileCount: 1,
+      totalFileCount: 2,
+      downloadBytes: 3,
+      minimumFits: true,
+      recommendedFits: true,
+      filesystemPath: "D:\\",
+    });
+  });
+
   it("checks access with the smallest file and saves no dataset bytes", async () => {
     const config = fakeConfig();
     const metadataClient = new AihubMetadataClient({
