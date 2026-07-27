@@ -11,7 +11,8 @@ Use the bundled tools to discover data, verify full-data access, inspect exact f
 
 - Extract `dataSetSn` from an AI Hub dataset URL and use it as `dataset_id`.
 - Treat an unqualified request such as "download this dataset and build a model" as a full-data request.
-- Treat the request as a sample request only when the user explicitly says `샘플`, `경량 샘플`, `sample`, or an equivalent unambiguous phrase.
+- Treat the request as a sample-data request only when the user explicitly asks for `샘플 데이터`, `경량 샘플 데이터`, `sample data`, `sample dataset`, or an equivalent unambiguous data phrase.
+- Do not treat `활용 샘플`, `샘플 앱`, `샘플 코드`, `예제 프로그램`, or similar downstream deliverables as a request for lightweight sample data. In those cases, follow the full-data flow and build the requested example only after an approved download succeeds.
 - Do not infer sample intent from phrases such as `작은 모델`, `빠른 실습`, `테스트`, `프로토타입`, or from a desire to reduce download size.
 
 ## Handle a full-data request

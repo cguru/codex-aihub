@@ -30,7 +30,7 @@ describe("AihubDownloadClient", () => {
       RequestInit,
     ];
     expect(requestUrl.pathname).toBe("/down/0.6/71362.do");
-    expect(requestUrl.searchParams.get("fileSn")).toBe("{11,22}");
+    expect(requestUrl.searchParams.get("fileSn")).toBe("11,22");
     expect(requestUrl.toString()).not.toContain("secret-fake-key");
     expect(new Headers(init.headers).get("apikey")).toBe("secret-fake-key");
   });

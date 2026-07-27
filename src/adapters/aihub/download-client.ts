@@ -122,7 +122,7 @@ export class AihubDownloadClient {
 }
 
 function formatFileIds(fileIds: number[]): string {
-  return fileIds.length === 1 ? String(fileIds[0]) : `{${fileIds.join(",")}}`;
+  return fileIds.join(",");
 }
 
 async function readBoundedText(response: Response): Promise<string> {

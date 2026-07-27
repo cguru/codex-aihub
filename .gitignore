@@ -7,6 +7,11 @@ logs/
 downloads/
 data/
 tmp/
+examples/
+.venv/
+artifacts/
+__pycache__/
+*.pyc
 *.part
 *.part[0-9]*
 *.log

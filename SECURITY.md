@@ -6,7 +6,14 @@
 
 The MCP server sends the key only in request headers. Metadata requests use `X-API-KEY` plus the non-secret `X-MCP-Client` and `X-MCP-Tool` audit headers. Official file downloads use the `apikey` header expected by AI Hub's downloader. Tool results and structured errors never include the key.
 
-If a key is exposed, revoke or rotate it through AI Hub and remove the exposed material from every affected system.
+If a key is exposed, do not publish the affected conversation, log, screenshot,
+or repository history. Issuing an additional AI Hub API key must not be assumed
+to invalidate the exposed key. The current public API guide documents key
+issuance but does not document a self-service revocation procedure, so contact
+AI Hub support at `aihub@aihub.kr` (or through the official contact page) and
+ask whether the exposed key can be disabled. Remove the exposed material from
+every affected local and remote system without copying the key into a public
+issue.
 
 ## Dataset safety
 
