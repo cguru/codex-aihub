@@ -1,6 +1,6 @@
 {
   "name": "codex-aihub",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "description": "Codex plugin for discovering AI Hub datasets and safely downloading selected approved files.",
   "type": "module",
   "license": "MIT",
