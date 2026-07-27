@@ -10,6 +10,12 @@ describe("loadConfig", () => {
       loadConfig({});
     } catch (error) {
       expect((error as AihubError).code).toBe("AIHUB_API_KEY_MISSING");
+      expect((error as AihubError).message).toContain(
+        "https://aihub.or.kr/devsport/apishell/list.do",
+      );
+      expect((error as AihubError).message).toContain(
+        "채팅에 붙여넣지 마세요",
+      );
     }
   });
 

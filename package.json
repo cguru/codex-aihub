@@ -4,6 +4,14 @@
   "description": "Local MCP server for searching and inspecting AI Hub dataset metadata from Codex.",
   "type": "module",
   "license": "MIT",
+  "homepage": "https://github.com/cguru/codex-aihub#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cguru/codex-aihub.git"
+  },
+  "bugs": {
+    "url": "https://github.com/cguru/codex-aihub/issues"
+  },
   "engines": {
     "node": ">=20"
   },

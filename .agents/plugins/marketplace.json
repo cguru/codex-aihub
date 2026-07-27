@@ -1,0 +1,21 @@
+{
+  "name": "codex-aihub",
+  "interface": {
+    "displayName": "AI Hub for Codex"
+  },
+  "plugins": [
+    {
+      "name": "codex-aihub",
+      "source": {
+        "source": "url",
+        "url": "https://github.com/cguru/codex-aihub.git",
+        "ref": "main"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_USE"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

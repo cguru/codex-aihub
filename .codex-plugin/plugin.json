@@ -1,7 +1,9 @@
 {
   "name": "codex-aihub",
   "version": "0.1.0",
-  "description": "Search and inspect AI Hub dataset metadata from Codex through a local MCP server.",
+  "description": "Codex에서 AI Hub 데이터셋 메타데이터를 검색하고 확인합니다.",
+  "homepage": "https://github.com/cguru/codex-aihub#readme",
+  "repository": "https://github.com/cguru/codex-aihub",
   "author": {
     "name": "codex-aihub contributors"
   },
@@ -15,17 +17,18 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "AI Hub for Codex",
-    "shortDescription": "Search AI Hub datasets from Codex.",
-    "longDescription": "Search, count, and inspect AI Hub dataset metadata with a local Node.js MCP server. Credentials remain in local environment variables.",
+    "shortDescription": "Codex에서 AI Hub 데이터셋을 검색합니다.",
+    "longDescription": "로컬 Node.js MCP 서버를 통해 AI Hub 데이터셋 메타데이터를 검색하고, 개수를 확인하고, 상세 정보를 조회합니다. 개인 API 키는 로컬 환경변수에만 보관됩니다.",
     "developerName": "codex-aihub contributors",
+    "websiteURL": "https://github.com/cguru/codex-aihub",
     "category": "Productivity",
     "capabilities": [
       "Read"
     ],
     "defaultPrompt": [
-      "Find AI Hub datasets related to Korean speech.",
-      "Count AI Hub datasets in the healthcare field.",
-      "Show the details for an AI Hub dataset."
+      "AI Hub에서 한국어 음성 데이터셋을 찾아줘.",
+      "AI Hub 의료 분야 데이터셋이 몇 개인지 세어줘.",
+      "AI Hub 데이터셋의 상세 정보를 보여줘."
     ]
   },
   "mcpServers": "./.mcp.json"

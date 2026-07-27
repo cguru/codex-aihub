@@ -23,7 +23,7 @@ Use the bundled read-only metadata tools to answer dataset discovery questions.
 
 ## Protect access and data
 
-- Never ask the user to paste `AIHUB_API_KEY` into the conversation. If it is missing, ask them to set it as a local environment variable and restart the plugin.
+- Never ask the user to paste `AIHUB_API_KEY` into the conversation. If it is missing, direct them to the official issuance page at `https://aihub.or.kr/devsport/apishell/list.do`, explain how to set it as a local environment variable on their operating system, and ask them to restart Codex.
 - Never expose the key in tool results, logs, URLs, or error messages.
 - Do not imply that metadata visibility grants download approval or dataset reuse rights.
 - Do not download data unless the user explicitly requests it and a future download tool is available. This version exposes metadata tools only.

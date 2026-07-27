@@ -18,7 +18,7 @@ export function loadConfig(
   if (!apiKey) {
     throw new AihubError(
       "AIHUB_API_KEY_MISSING",
-      "AIHUB_API_KEY가 설정되지 않았습니다. 개인 API 키를 로컬 환경변수에 설정한 뒤 플러그인을 다시 시작하세요.",
+      "AIHUB_API_KEY가 설정되지 않았습니다. https://aihub.or.kr/devsport/apishell/list.do 에서 개인 API 키를 발급받아 로컬 환경변수에 설정한 뒤 Codex를 다시 시작하세요. API 키는 채팅에 붙여넣지 마세요.",
     );
   }
 
