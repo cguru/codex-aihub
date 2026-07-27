@@ -4,7 +4,7 @@
 
 `AIHUB_API_KEY` must be supplied through the local environment. Do not include a real key in an issue, prompt, screenshot, fixture, log, URL, or committed file.
 
-The MCP server sends the key only in the `X-API-KEY` request header. Tool results and structured errors never include it.
+The MCP server sends the key only in the `X-API-KEY` request header. It also sends the non-secret `X-MCP-Client` and `X-MCP-Tool` audit headers required by the AI Hub metadata service. Tool results and structured errors never include the key.
 
 If a key is exposed, revoke or rotate it through AI Hub and remove the exposed material from every affected system.
 

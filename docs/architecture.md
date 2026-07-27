@@ -31,7 +31,8 @@ The plugin root contains `.codex-plugin/plugin.json`, `.mcp.json`, and the `aihu
 `src/adapters/aihub` owns:
 
 - endpoint paths and query parameter names;
-- `X-API-KEY` authentication;
+- `X-API-KEY` authentication plus the official `X-MCP-Client` and
+  `X-MCP-Tool` audit headers;
 - timeouts and HTTP error classification;
 - upstream envelope parsing;
 - conversion of `{ value, label, description }` fields into plain structured data;

@@ -74,6 +74,12 @@ describe("AihubMetadataClient", () => {
     expect(url.searchParams.get("recordCountPerPage")).toBe("10");
     expect(url.searchParams.get("firstIndex")).toBe("20");
     expect(new Headers(requestInit?.headers).get("X-API-KEY")).toBe("fake-test-key");
+    expect(new Headers(requestInit?.headers).get("X-MCP-Client")).toBe(
+      "codex-aihub",
+    );
+    expect(new Headers(requestInit?.headers).get("X-MCP-Tool")).toBe(
+      "searchDataSets",
+    );
     expect(url.toString()).not.toContain("fake-test-key");
   });
 
@@ -96,6 +102,10 @@ describe("AihubMetadataClient", () => {
     expect(url.searchParams.get("srchDataRealmCode")).toBe("REALM006");
     expect(url.searchParams.has("recordCountPerPage")).toBe(false);
     expect(url.searchParams.has("firstIndex")).toBe(false);
+    const [, requestInit] = readCall(fetchMock);
+    expect(new Headers(requestInit?.headers).get("X-MCP-Tool")).toBe(
+      "countDataSets",
+    );
   });
 
   it("unwraps detail sections while preserving unknown fields", async () => {

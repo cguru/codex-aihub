@@ -23,6 +23,13 @@ const ENDPOINTS = {
   guide: "/mcp/getDataSetsWithGuide.do",
 } as const;
 
+const AUDIT_TOOLS = {
+  search: "searchDataSets",
+  count: "countDataSets",
+  detail: "getDataSet",
+  guide: "getDataSetsWithGuide",
+} as const;
+
 type FetchImplementation = typeof globalThis.fetch;
 
 export interface MetadataClientOptions {
@@ -45,6 +52,7 @@ export class AihubMetadataClient {
     const envelope = await this.request(
       ENDPOINTS.search,
       searchParams(input, { limit, offset }),
+      AUDIT_TOOLS.search,
     );
     const items = extractList(envelope, ENDPOINTS.search);
     const totalCount = extractTotalCount(envelope, ENDPOINTS.search, items.length);
@@ -55,6 +63,7 @@ export class AihubMetadataClient {
     const envelope = await this.request(
       ENDPOINTS.count,
       searchParams(filters),
+      AUDIT_TOOLS.count,
     );
     return extractTotalCount(envelope, ENDPOINTS.count);
   }
@@ -63,6 +72,7 @@ export class AihubMetadataClient {
     const envelope = await this.request(
       ENDPOINTS.detail,
       new URLSearchParams({ dataSetSn: String(id) }),
+      AUDIT_TOOLS.detail,
     );
     return extractDetail(envelope, ENDPOINTS.detail);
   }
@@ -79,6 +89,7 @@ export class AihubMetadataClient {
         firstIndex: "0",
         recordCountPerPage: String(limit),
       }),
+      AUDIT_TOOLS.guide,
     );
 
     return {
@@ -91,6 +102,7 @@ export class AihubMetadataClient {
   private async request(
     endpoint: string,
     params: URLSearchParams,
+    auditTool: string,
   ): Promise<Record<string, unknown>> {
     const config = this.configProvider();
     const url = new URL(endpoint, `${config.metadataBaseUrl}/`);
@@ -104,6 +116,8 @@ export class AihubMetadataClient {
         headers: {
           Accept: "application/json",
           "X-API-KEY": config.apiKey,
+          "X-MCP-Client": "codex-aihub",
+          "X-MCP-Tool": auditTool,
         },
         signal: controller.signal,
       });
