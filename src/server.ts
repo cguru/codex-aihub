@@ -13,7 +13,7 @@ export function createAihubServer(): McpServer {
   const server = new McpServer(
     {
       name: "codex-aihub",
-      version: "0.5.5",
+      version: "0.5.6",
     },
     {
       instructions:

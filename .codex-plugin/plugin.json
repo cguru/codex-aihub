@@ -1,6 +1,6 @@
 {
   "name": "codex-aihub",
-  "version": "0.5.5",
+  "version": "0.5.6",
   "description": "Codex에서 AI Hub 승인과 디스크 용량을 확인하고 선택한 데이터 파일을 안전하게 받습니다.",
   "homepage": "https://github.com/cguru/codex-aihub#readme",
   "repository": "https://github.com/cguru/codex-aihub",
