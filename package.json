@@ -1,6 +1,6 @@
 {
   "name": "codex-aihub",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Codex plugin for discovering AI Hub datasets and safely downloading selected approved files.",
   "type": "module",
   "license": "MIT",
@@ -27,10 +27,11 @@
   ],
   "scripts": {
     "build": "tsup && node scripts/normalize-bundle.mjs",
+    "smoke:bundle": "node scripts/smoke-test-bundle.mjs",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "check": "npm run typecheck && npm test && npm run build"
+    "check": "npm run typecheck && npm test && npm run build && npm run smoke:bundle"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.29.0",

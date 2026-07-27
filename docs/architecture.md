@@ -26,7 +26,7 @@ The plugin root contains `.codex-plugin/plugin.json`, `.mcp.json`, and the `aihu
 
 ### MCP layer
 
-`src/tools` owns user-facing names, schemas, descriptions, output summaries, and safety annotations. Metadata and file inventory tools are read-only. `download_dataset_files` is a non-destructive write operation and requires explicit file keys plus a new absolute destination.
+`src/tools` owns user-facing names, schemas, descriptions, output summaries, and safety annotations. Metadata, access-check, and file inventory tools do not write local data. `download_dataset_files` is a non-destructive write operation and requires explicit file keys plus a new absolute destination.
 
 ### AI Hub adapter
 
@@ -62,6 +62,7 @@ Synthetic contract tests capture the currently observed envelope without incorpo
 
 `src/download` implements:
 
+- a preflight authorization check that opens the smallest API file response and immediately cancels it without saving dataset bytes;
 - structured file inventory from dataset detail metadata;
 - exact file-key validation and size previews;
 - collision-safe destinations and disk-space checks;
@@ -70,4 +71,4 @@ Synthetic contract tests capture the currently observed envelope without incorpo
 - numeric `.partN` merging;
 - atomic destination finalization and temporary cleanup.
 
-The lightweight sample link is not part of this API-key download path. It is rendered only for an authenticated AI Hub web session, so the bundled skill uses an available signed-in browser for sample downloads and never asks for cookies.
+The lightweight sample link is not part of this API-key download path. It is rendered only for an authenticated AI Hub web session. The bundled skill uses this browser path only when the user explicitly requests a sample and never asks for cookies. It never substitutes a sample for an unapproved full-data request.

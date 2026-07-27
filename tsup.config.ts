@@ -11,6 +11,11 @@ export default defineConfig({
   sourcemap: false,
   clean: true,
   outDir: "dist",
+  banner: {
+    js:
+      'import { createRequire as __createNodeRequire } from "node:module";' +
+      "const require = __createNodeRequire(import.meta.url);",
+  },
   noExternal: ["@modelcontextprotocol/sdk", "tar-stream", "zod"],
   outExtension: () => ({ js: ".mjs" }),
 });

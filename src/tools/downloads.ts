@@ -24,10 +24,51 @@ const downloadAnnotations = {
   openWorldHint: true,
 } as const;
 
+const accessCheckAnnotations = {
+  readOnlyHint: true,
+  destructiveHint: false,
+  idempotentHint: true,
+  openWorldHint: true,
+} as const;
+
 export function registerDownloadTools(
   server: McpServer,
   downloader: DatasetDownloader,
 ): void {
+  server.registerTool(
+    "check_dataset_download_access",
+    {
+      title: "Check AI Hub dataset download access",
+      description:
+        "Check whether the current AIHUB_API_KEY can download the full API files for one AI Hub dataset. Call this first whenever the user asks to download a dataset or build something from downloaded data, unless the user explicitly asked for sample/lightweight sample data. The check opens the smallest API file response only long enough to verify authorization, cancels it immediately, and does not save dataset bytes.",
+      inputSchema: {
+        dataset_id: z
+          .number()
+          .int()
+          .positive()
+          .describe("AI Hub dataSetSn identifier parsed from the dataset URL."),
+      },
+      outputSchema: {
+        datasetId: z.number().int().positive(),
+        datasetName: z.string().nullable(),
+        datasetUrl: z.string().url(),
+        approved: z.literal(true),
+        probeFile: datasetFile,
+      },
+      annotations: accessCheckAnnotations,
+    },
+    async ({ dataset_id: datasetId }) =>
+      runTool(async () => {
+        const result = await downloader.checkAccess(datasetId);
+        return {
+          data: result,
+          message:
+            "정식 API 데이터 다운로드 승인이 확인되었습니다. " +
+            "승인 확인 과정에서는 파일을 저장하지 않았습니다.",
+        };
+      }),
+  );
+
   server.registerTool(
     "list_dataset_files",
     {
@@ -99,7 +140,7 @@ export function registerDownloadTools(
     {
       title: "Download selected AI Hub dataset files",
       description:
-        "Download explicitly selected, approved AI Hub dataset files into a new absolute destination directory. Call only after the user has explicitly requested a download and the exact file keys, sizes, and destination have been resolved. Never use it to download every file by default. It refuses existing destinations, checks disk space, extracts TAR paths safely, and merges numeric .part files.",
+        "Download explicitly selected, approved AI Hub dataset files into a new absolute destination directory. For ordinary full-data requests, call check_dataset_download_access first. Call this tool only after the user has explicitly requested a download and the exact file keys, sizes, and destination have been resolved. Never use it to download every file by default. It refuses existing destinations, checks disk space, extracts TAR paths safely, and merges numeric .part files.",
       inputSchema: {
         dataset_id: z
           .number()

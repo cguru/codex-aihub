@@ -12,9 +12,9 @@ If a key is exposed, revoke or rotate it through AI Hub and remove the exposed m
 
 This repository must not contain downloaded AI Hub datasets. Dataset access, storage, sharing, and transfer remain subject to AI Hub approval and data usage policies.
 
-Downloads require explicit file keys and a new absolute destination. The downloader refuses existing destinations, checks available disk space, limits transfer and extracted sizes, rejects absolute/traversal TAR paths and links, merges `.partN` files numerically, and finalizes from a temporary directory. Downloaded datasets remain excluded from Git.
+Full-data workflows first perform an authorization probe against the smallest listed API file. The response is cancelled immediately after authorization is verified and no dataset file is saved. Downloads then require explicit file keys and a new absolute destination. The downloader refuses existing destinations, checks available disk space, limits transfer and extracted sizes, rejects absolute/traversal TAR paths and links, merges `.partN` files numerically, and finalizes from a temporary directory. Downloaded datasets remain excluded from Git.
 
-The lightweight sample button is a separate AI Hub web-login flow. Never request, export, or persist browser cookies to automate it.
+The lightweight sample button is a separate AI Hub web-login flow. Use it only after an explicit sample request. Never request, export, or persist browser cookies to automate it.
 
 ## Reporting a vulnerability
 

@@ -19,6 +19,7 @@ import {
   mergeMultipartFiles,
 } from "./archive.js";
 import type {
+  DatasetDownloadAccessResult,
   DatasetFile,
   DatasetFileInventory,
   DatasetFilePage,
@@ -67,6 +68,32 @@ export class DatasetDownloader {
       totalSizeBytes,
       limit: options.limit,
       offset: options.offset,
+    };
+  }
+
+  async checkAccess(datasetId: number): Promise<DatasetDownloadAccessResult> {
+    const inventory = await this.requireInventory(datasetId);
+    const probeFile = [...inventory.files].sort(
+      (left, right) => left.sizeBytes - right.sizeBytes,
+    )[0];
+    if (!probeFile) {
+      throw new AihubError(
+        "AIHUB_FILE_NOT_FOUND",
+        `AI Hub 데이터셋 ${datasetId}에 다운로드 가능 여부를 확인할 정식 API 파일이 없습니다.`,
+      );
+    }
+
+    const response = await this.downloadClient.openDatasetFiles(datasetId, [
+      probeFile.fileId,
+    ]);
+    await response.body?.cancel("AI Hub download access check completed");
+
+    return {
+      datasetId: inventory.datasetId,
+      datasetName: inventory.datasetName,
+      datasetUrl: inventory.datasetUrl,
+      approved: true,
+      probeFile,
     };
   }
 

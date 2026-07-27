@@ -223,8 +223,8 @@ function notApproved(datasetId: number, status: number): AihubError {
     `&aihubDataSe=data&dataSetSn=${datasetId}`;
   return new AihubError(
     "AIHUB_DOWNLOAD_NOT_APPROVED",
-    "이 AI Hub 데이터셋의 다운로드 승인이 확인되지 않았습니다. " +
-      `데이터셋 상세 페이지에서 다운로드를 눌러 이용 신청과 승인을 완료한 뒤 다시 시도하세요: ${url}`,
+    "승인받지 않은 데이터는 다운로드할 수 없습니다. " +
+      `AI Hub에서 데이터 사용 신청과 승인을 완료한 뒤 다시 요청해 주세요: ${url}`,
     { status, endpoint: `/down/{version}/${datasetId}.do` },
   );
 }

@@ -23,6 +23,62 @@ afterEach(async () => {
 });
 
 describe("DatasetDownloader", () => {
+  it("checks access with the smallest file and saves no dataset bytes", async () => {
+    const config = fakeConfig();
+    const metadataClient = new AihubMetadataClient({
+      config: () => config,
+      fetchImpl: vi.fn(async () => metadataResponse()) as unknown as typeof fetch,
+    });
+    const downloadFetch = vi.fn(async () =>
+      new Response(new Uint8Array([1, 2, 3]), {
+        status: 200,
+        headers: { "Content-Type": "application/x-tar" },
+      }),
+    );
+    const downloadClient = new AihubDownloadClient({
+      config: () => config,
+      fetchImpl: downloadFetch as unknown as typeof fetch,
+    });
+    const downloader = new DatasetDownloader(metadataClient, downloadClient);
+
+    const result = await downloader.checkAccess(123);
+
+    expect(result).toMatchObject({
+      datasetId: 123,
+      approved: true,
+      probeFile: { fileId: 789, sizeBytes: 1 },
+    });
+    const [url] = downloadFetch.mock.calls[0] as unknown as [URL, RequestInit];
+    expect(url.searchParams.get("fileSn")).toBe("789");
+  });
+
+  it("stops an unapproved access check before any download destination exists", async () => {
+    const config = fakeConfig();
+    const metadataClient = new AihubMetadataClient({
+      config: () => config,
+      fetchImpl: vi.fn(async () => metadataResponse()) as unknown as typeof fetch,
+    });
+    const downloadClient = new AihubDownloadClient({
+      config: () => config,
+      fetchImpl: vi.fn(async () =>
+        new Response("데이터 사용 승인 필요", {
+          status: 403,
+          headers: { "Content-Type": "text/plain" },
+        }),
+      ) as unknown as typeof fetch,
+    });
+    const downloader = new DatasetDownloader(metadataClient, downloadClient);
+
+    const error = await downloader.checkAccess(123).catch((caught) => caught);
+
+    expect(error).toMatchObject({
+      code: "AIHUB_DOWNLOAD_NOT_APPROVED",
+    });
+    expect((error as Error).message).toContain(
+      "승인받지 않은 데이터는 다운로드할 수 없습니다.",
+    );
+  });
+
   it("downloads a selected file through a temporary TAR and finalizes it", async () => {
     const root = await mkdtemp(resolve(tmpdir(), "codex-aihub-download-test-"));
     temporaryDirectories.push(root);
@@ -98,6 +154,12 @@ function metadataResponse(): Response {
                 fileSize: { value: 3 },
                 fileStreCours: { value: "dataset/labels.zip" },
                 streFileNm: { value: "labels.zip" },
+              },
+              {
+                fileSn: { value: 789 },
+                fileSize: { value: 1 },
+                fileStreCours: { value: "dataset/readme.txt" },
+                streFileNm: { value: "readme.txt" },
               },
             ],
           },

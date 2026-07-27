@@ -46,6 +46,16 @@ Still planned:
 - safe resume across process restarts;
 - data-package downloads.
 
+## Milestone 0.4 — approval-first workflow
+
+Status: implemented.
+
+- `check_dataset_download_access` preflight before full-data work;
+- no local dataset file written during the approval probe;
+- unapproved requests stop before download and downstream model work;
+- lightweight samples are used only after an explicit sample request;
+- dataset URLs are interpreted through their `dataSetSn` identifier.
+
 ## Milestone 1.0 — public release
 
 - validate behavior with approved real-data access outside the default test suite;

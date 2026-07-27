@@ -19,6 +19,14 @@ export interface DatasetFilePage extends DatasetFileInventory {
   offset: number;
 }
 
+export interface DatasetDownloadAccessResult {
+  datasetId: number;
+  datasetName: string | null;
+  datasetUrl: string;
+  approved: true;
+  probeFile: DatasetFile;
+}
+
 export interface DownloadDatasetFilesInput {
   datasetId: number;
   fileIds: number[];

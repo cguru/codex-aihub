@@ -15,7 +15,7 @@ describe("MCP server", () => {
     const server = createAihubServer();
     const client = new Client({
       name: "codex-aihub-test",
-      version: "0.3.0",
+      version: "0.4.0",
     });
     closeCallbacks.push(async () => {
       await client.close();
@@ -31,10 +31,11 @@ describe("MCP server", () => {
       "count_datasets",
       "get_dataset",
       "get_datasets_with_guide",
+      "check_dataset_download_access",
       "list_dataset_files",
       "download_dataset_files",
     ]);
-    for (const tool of response.tools.slice(0, 5)) {
+    for (const tool of response.tools.slice(0, 4)) {
       expect(tool.annotations).toMatchObject({
         readOnlyHint: true,
         destructiveHint: false,
@@ -43,6 +44,18 @@ describe("MCP server", () => {
       });
     }
 
+    expect(response.tools[4]?.annotations).toMatchObject({
+      readOnlyHint: true,
+      destructiveHint: false,
+      idempotentHint: true,
+      openWorldHint: true,
+    });
+    expect(response.tools[5]?.annotations).toMatchObject({
+      readOnlyHint: true,
+      destructiveHint: false,
+      idempotentHint: true,
+      openWorldHint: false,
+    });
     expect(response.tools.at(-1)?.annotations).toMatchObject({
       readOnlyHint: false,
       destructiveHint: false,

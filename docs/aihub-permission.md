@@ -29,6 +29,8 @@ The project will:
 - keep real downloaded data out of source control, releases, and fixtures;
 - avoid features that bypass approval or facilitate dataset redistribution;
 - keep lightweight-sample browser access separate from approved API file downloads;
+- verify full-data approval before file selection or downstream model work;
+- never substitute a lightweight sample unless the user explicitly requests one;
 - treat the plugin's MIT license as applying only to this repository's original source code.
 
 ## Public notice

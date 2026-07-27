@@ -48,7 +48,10 @@ describe("AihubDownloadClient", () => {
 
     expect(error).toBeInstanceOf(AihubError);
     expect((error as AihubError).code).toBe("AIHUB_DOWNLOAD_NOT_APPROVED");
-    expect((error as Error).message).toContain("이용 신청");
+    expect((error as Error).message).toContain(
+      "승인받지 않은 데이터는 다운로드할 수 없습니다.",
+    );
+    expect((error as Error).message).toContain("데이터 사용 신청");
     expect((error as Error).message).not.toContain("secret-fake-key");
   });
 
