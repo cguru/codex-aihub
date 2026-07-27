@@ -2,48 +2,98 @@
 
 `codex-aihub`는 Codex에서 자연어로 [AI Hub](https://aihub.or.kr/) 데이터셋을 찾고, 파일 목록과 용량을 확인하고, 승인된 파일을 선택해서 안전하게 다운로드할 수 있게 해 주는 비공식 오픈소스 플러그인입니다.
 
-현재 `0.5.5` 버전은 데이터셋 검색·개수·상세 정보·가이드 조회, 정식 데이터 다운로드 승인 사전 확인, 정확한 파일 목록과 전체 용량 확인, 대상 드라이브 여유 공간 검사, 선택한 파일 다운로드를 지원합니다. 일반적인 데이터 다운로드나 모델 구축 요청은 승인과 저장 공간을 먼저 확인하며, **샘플(경량) 데이터는 사용자가 명시적으로 샘플 데이터를 요청했을 때만** 사용합니다.
+현재 `0.5.6` 버전은 데이터셋 검색·개수·상세 정보·가이드 조회, 정식 데이터 다운로드 승인 사전 확인, 정확한 파일 목록과 전체 용량 확인, 대상 드라이브 여유 공간 검사, 선택한 파일 다운로드를 지원합니다. 일반적인 데이터 다운로드나 모델 구축 요청은 승인과 저장 공간을 먼저 확인하며, **샘플(경량) 데이터는 사용자가 명시적으로 샘플 데이터를 요청했을 때만** 사용합니다.
 
 > **API 키 발급:** [AI Hub 오픈 API 이용안내·API Key 발급](https://aihub.or.kr/devsport/apishell/list.do)에 로그인한 뒤 **API key 발급** 버튼을 누르세요. 발급된 개인 키는 이메일로 전송됩니다. 키 값은 채팅이나 공개 글에 붙여넣지 마세요.
 
 ## 가장 쉬운 설치 방법: Codex에게 맡기기
 
-Codex에 아래 메시지를 그대로 보내세요.
+사용 중인 운영체제에 맞는 메시지 하나를 새 Codex 작업에 그대로 보내세요.
+Codex가 플러그인을 먼저 설치하고 API 키 등록 여부를 확인합니다. 키가 없으면
+공식 발급 페이지를 안내한 뒤 멈추며, 사용자가 **키 값이 아닌 로컬 키 파일
+경로**를 알려준 경우에만 등록을 계속합니다.
+
+### Windows에서 Codex에게 맡기기
 
 ```text
+Windows에서 Codex를 사용하고 있어.
+
 다음 GitHub 저장소의 Codex 플러그인을 설치해줘:
 https://github.com/cguru/codex-aihub
 
-이 저장소를 플러그인 마켓플레이스로 추가하고 codex-aihub를 설치해줘.
-AIHUB_API_KEY가 없으면 키를 채팅으로 받지 말고 아래 공식 발급 페이지를 안내해줘:
+먼저 현재 플러그인과 마켓플레이스 상태를 확인해줘.
+codex-aihub 마켓플레이스가 없으면 위 저장소를 마켓플레이스로 추가하고,
+플러그인이 없으면 codex-aihub@codex-aihub를 설치해줘.
+이미 설치되어 있으면 마켓플레이스를 갱신하고 설치 버전을 알려줘.
+
+그다음 Windows 사용자 환경변수와 현재 프로세스에 AIHUB_API_KEY가
+등록되어 있는지만 확인해줘. 키 값은 절대 출력하지 마.
+등록되어 있지 않으면 키를 채팅에 입력하라고 요청하지 말고
+아래 공식 발급 페이지와 키 파일 준비 방법만 안내한 뒤 기다려줘:
 https://aihub.or.kr/devsport/apishell/list.do
-내가 로컬 키 파일의 경로를 알려주면 키 값을 화면에 출력하지 말고,
-파일에서 실제 키만 읽어 Windows 사용자 환경변수 AIHUB_API_KEY에 등록해줘.
-파일이 "AIHUB_KEY=키" 또는 "AIHUB_API_KEY=키" 형식이면 등호 뒤의 값만 등록해줘.
-설치 후 새 Codex 작업에서 시험할 질문도 알려줘.
-데이터셋 URL로 다운로드나 모델 제작을 요청하면 정식 다운로드 승인을 먼저 확인하고,
-승인되지 않았으면 데이터 사용 신청을 안내한 뒤 작업을 중단해줘.
-승인됐다면 API 파일 목록의 정확한 전체 용량과 대상 드라이브의 여유 공간을 비교하고,
-다운로드 최소 공간과 압축 해제·학습용 권장 공간이 부족하면 먼저 알려줘.
-샘플 데이터는 내가 샘플 데이터 또는 경량 샘플 데이터라고 명시했을 때만 사용하고,
-정식 파일은 전체를 임의로 받지 말고 파일명과 용량을 먼저 보여준 뒤
-내가 명시적으로 선택한 파일만 새 작업 폴더에 다운로드해줘.
+
+내가 이 작업에서 로컬 키 파일의 전체 경로를 알려준 경우에만
+그 파일을 로컬에서 읽어 등록을 계속해줘. 파일 내용은 화면, 채팅,
+명령 기록, 로그에 출력하지 마. 파일이 실제 키 한 줄이거나
+AIHUB_KEY=키 또는 AIHUB_API_KEY=키 형식이면 실제 키 값만 추출하고,
+올바른 UUID 형식인지 검사한 뒤 Windows 사용자 환경변수
+AIHUB_API_KEY에 영구 등록해줘. 저장소, .mcp.json, config.toml에는
+키를 기록하지 마.
+
+마지막으로 키 값은 보여주지 않고 등록 여부만 확인해줘.
+Codex를 완전히 종료한 뒤 다시 시작해야 한다고 안내하고,
+새 작업에서 시험할 질문으로
+"@AI Hub 한국어 음성 데이터셋을 찾아줘."를 알려줘.
 ```
 
-Codex는 다음 작업을 진행하거나 필요한 절차를 안내합니다.
+### macOS에서 Codex에게 맡기기
 
-1. 이 GitHub 저장소를 플러그인 마켓플레이스로 추가합니다.
-2. `codex-aihub` 플러그인을 설치합니다.
-3. AI Hub API 키가 없다면 공식 발급 페이지와 로컬 설정 방법을 안내합니다.
-4. 설치와 키 설정이 끝나면 Codex를 다시 시작하거나 새 작업을 열도록 안내합니다.
+```text
+macOS에서 Codex를 사용하고 있어.
 
-API 키는 비밀번호와 같은 개인 인증 정보입니다. Codex 채팅, 프롬프트, 소스 코드, `.mcp.json`, 로그에 붙여넣지 마세요.
+다음 GitHub 저장소의 Codex 플러그인을 설치해줘:
+https://github.com/cguru/codex-aihub
+
+먼저 현재 플러그인과 마켓플레이스 상태를 확인해줘.
+codex-aihub 마켓플레이스가 없으면 위 저장소를 마켓플레이스로 추가하고,
+플러그인이 없으면 codex-aihub@codex-aihub를 설치해줘.
+이미 설치되어 있으면 마켓플레이스를 갱신하고 설치 버전을 알려줘.
+
+그다음 AIHUB_API_KEY가 등록되어 있는지만 확인해줘.
+launchctl getenv의 실제 결과나 키 값은 절대 출력하지 말고,
+등록됨 또는 등록되지 않음만 알려줘.
+등록되어 있지 않으면 키를 채팅에 입력하라고 요청하지 말고
+아래 공식 발급 페이지와 키 파일 준비 방법만 안내한 뒤 기다려줘:
+https://aihub.or.kr/devsport/apishell/list.do
+
+내가 이 작업에서 로컬 키 파일의 전체 경로를 알려준 경우에만
+그 파일을 로컬에서 읽어 등록을 계속해줘. 파일 내용은 화면, 채팅,
+명령 기록, 로그에 출력하지 마. 파일이 실제 키 한 줄이거나
+AIHUB_KEY=키 또는 AIHUB_API_KEY=키 형식이면 실제 키 값만 추출하고,
+올바른 UUID 형식인지 검사해줘.
+
+검사가 끝나면 현재 macOS 로그인 세션의 사용자 환경에
+launchctl setenv AIHUB_API_KEY 방식으로 등록해줘. 키를 .zshrc,
+.zprofile, 저장소, .mcp.json, config.toml에 평문으로 기록하지 마.
+키 값은 보여주지 않고 등록 여부만 확인해줘.
+
+이 등록은 현재 macOS 로그인 세션에 적용되며 로그아웃이나 재부팅 뒤에는
+다시 등록해야 할 수 있다고 알려줘. Codex 앱은 완전히 종료한 뒤 다시 열고,
+Codex CLI라면 Codex와 터미널 앱을 완전히 종료한 뒤 새 터미널에서 다시
+실행해야 한다고 안내해줘. 새 작업에서 시험할 질문으로
+"@AI Hub 한국어 음성 데이터셋을 찾아줘."를 알려줘.
+```
+
+두 프롬프트 모두 키를 직접 받도록 허용하지 않습니다. API 키는 비밀번호와
+같은 개인 인증 정보입니다. Codex 채팅, 프롬프트, 소스 코드, `.mcp.json`,
+`config.toml`, 로그에 붙여넣지 마세요.
 
 ## 직접 설치하기
 
-터미널에서 직접 설치하려면 다음 명령을 실행하세요.
+Windows와 macOS 모두 Node.js 20 이상이 필요합니다. 터미널에서 직접
+설치할 때 사용하는 Codex 명령은 두 운영체제에서 같습니다.
 
-```powershell
+```bash
 codex plugin marketplace add cguru/codex-aihub
 codex plugin add codex-aihub@codex-aihub
 ```
@@ -76,7 +126,7 @@ Codex는 다음 순서로 업데이트를 진행합니다.
 
 터미널에서 직접 업데이트하려면 다음 명령을 실행하세요.
 
-```powershell
+```bash
 codex plugin list --marketplace codex-aihub
 codex plugin marketplace upgrade codex-aihub
 codex plugin list --marketplace codex-aihub
@@ -89,7 +139,7 @@ codex plugin list --marketplace codex-aihub
 마켓플레이스를 새로고침했는데도 버전이 바뀌지 않은 경우에만 다음 명령으로
 플러그인을 다시 설치한 뒤 버전을 다시 확인하세요.
 
-```powershell
+```bash
 codex plugin add codex-aihub@codex-aihub
 codex plugin list --marketplace codex-aihub
 ```
@@ -101,11 +151,8 @@ codex plugin list --marketplace codex-aihub
 
 1. [AI Hub 공식 API 안내·키 발급 페이지](https://aihub.or.kr/devsport/apishell/list.do)에 로그인합니다.
 2. **API key 발급**을 누르고 메일로 받은 개인 키를 확인합니다.
-3. Windows 시작 메뉴에서 **환경 변수 편집**을 검색해 엽니다.
-4. **사용자 변수**에 새 변수를 추가합니다.
-   - 변수 이름: `AIHUB_API_KEY`
-   - 변수 값: 메일의 `APIKEY` 오른쪽에 표시된 값만 입력
-5. 실행 중인 Codex를 완전히 종료한 뒤 다시 시작합니다.
+3. 키를 저장소 밖의 개인 키 파일에 한 줄로 저장합니다.
+4. 아래에서 사용 중인 운영체제의 등록 방법을 따릅니다.
 
 환경변수의 **이름**은 `AIHUB_API_KEY`이고, **값**에는 실제 키만 들어가야 합니다.
 
@@ -115,8 +162,6 @@ codex plugin list --marketplace codex-aihub
 | 변수 값 | 메일에서 받은 APIKEY 값만 입력 |
 
 변수 값에 `AIHUB_KEY=`나 `AIHUB_API_KEY=`를 붙이거나 따옴표로 감싸지 마세요. `AIHUB_API_KEY=발급받은-키` 전체를 변수 값에 넣는 것은 잘못된 등록입니다.
-
-### 키 파일에서 안전하게 등록하기
 
 키 파일은 저장소 밖의 개인 폴더에 두세요. 파일 내용은 다음 두 형식 중 하나만 사용합니다.
 아래의 `발급받은-키`는 자리표시자입니다. 이 글자를 그대로 복사하지 말고 메일의 `APIKEY` 오른쪽 값을 넣으세요.
@@ -131,7 +176,15 @@ codex plugin list --marketplace codex-aihub
 AIHUB_API_KEY=발급받은-키
 ```
 
-아래 PowerShell 블록을 **그대로 실행**하면 키 파일 경로만 물어봅니다. 키 값은 화면이나 명령 기록에 출력하지 않으며, 두 파일 형식을 모두 처리해 실제 키만 Windows 사용자 환경변수에 저장합니다.
+### Windows에서 키 등록하기
+
+Windows 시작 메뉴에서 **환경 변수 편집**을 검색한 뒤 **사용자 변수**에
+`AIHUB_API_KEY`를 추가할 수 있습니다. 변수 값에는 메일의 `APIKEY`
+오른쪽에 표시된 값만 입력하세요.
+
+또는 아래 PowerShell 블록을 **그대로 실행**하세요. 키 파일 경로만
+물어보며, 키 값은 화면이나 명령 기록에 출력하지 않습니다. 두 파일 형식을
+모두 처리해 실제 키만 Windows 사용자 환경변수에 저장합니다.
 
 ```powershell
 & {
@@ -166,15 +219,49 @@ if ([string]::IsNullOrWhiteSpace(
 }
 ```
 
-일시적으로 현재 PowerShell 창에서만 시험하려면 아래처럼 설정할 수도 있습니다. 이 창에서 Codex를 실행해야 값이 전달됩니다.
+### macOS에서 키 등록하기
 
-```powershell
-$env:AIHUB_API_KEY = "발급받은-개인-키"
+아래 블록을 macOS 터미널에 **그대로 실행**하세요. 키 파일 경로만
+물어보며 키 값은 화면이나 명령 기록에 출력하지 않습니다. 실제 키는 현재
+터미널과 현재 macOS 로그인 세션에 등록됩니다.
+
+```zsh
+read "key_file?AI Hub API 키 파일의 전체 경로: "
+key_file="${key_file/#\~/$HOME}"
+
+key="$(
+  sed -E 's/^(AIHUB_API_KEY|AIHUB_KEY)[[:space:]]*=[[:space:]]*//' \
+    "$key_file" | tr -d '\r\n'
+)"
+key="${key#\"}"
+key="${key%\"}"
+key="${key#\'}"
+key="${key%\'}"
+
+if [[ ! "$key" =~ ^[0-9A-Fa-f]{8}(-[0-9A-Fa-f]{4}){3}-[0-9A-Fa-f]{12}$ ]]; then
+  echo "키 파일에서 올바른 AI Hub API 키를 찾지 못했습니다."
+else
+  chmod 600 "$key_file"
+  export AIHUB_API_KEY="$key"
+  launchctl setenv AIHUB_API_KEY "$key"
+
+  if [[ -n "$(launchctl getenv AIHUB_API_KEY)" ]]; then
+    echo "등록 완료: Codex를 완전히 종료한 뒤 다시 시작하세요."
+  else
+    echo "등록되지 않음"
+  fi
+fi
+
+unset key key_file
 ```
 
-위 명령의 따옴표는 PowerShell 문법이며 환경변수 값에 포함되지 않습니다.
+`launchctl setenv` 등록은 현재 macOS 로그인 세션에 적용됩니다. 로그아웃이나
+재부팅 뒤에는 다시 등록해야 할 수 있습니다. 키를 영구 보관한다는 이유로
+`.zshrc`, `.zprofile`, `.mcp.json`, `config.toml`에 평문으로 복사하지 마세요.
 
-키 값을 채팅에 보내 설치를 맡기는 방식은 권장하지 않습니다. Codex에게는 발급 페이지를 열어 달라고 하거나, 운영체제에 맞는 환경변수 설정 절차만 안내해 달라고 하세요.
+Windows와 macOS 모두 등록 뒤 실행 중인 Codex를 완전히 종료하고 다시
+시작해야 합니다. 키 값을 채팅에 보내 설치를 맡기지 말고, Codex에는 로컬
+키 파일의 경로만 알려주세요.
 
 ## Codex에서 사용하기
 
