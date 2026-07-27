@@ -64,6 +64,7 @@ Status: implemented.
 - exact API inventory byte totals instead of relying on approximate page sizes;
 - prospective destination filesystem and current free-space inspection;
 - hard minimum, recommended space, and shortfall reporting;
+- rounded approximate MB, GB, or TB user-facing summaries while retaining exact bytes for calculations;
 - capacity check before file selection and again before the final download.
 
 ## Milestone 1.0 — public release

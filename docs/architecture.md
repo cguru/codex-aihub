@@ -63,7 +63,7 @@ Synthetic contract tests capture the currently observed envelope without incorpo
 `src/download` implements:
 
 - a preflight authorization check that opens the smallest API file response and immediately cancels it without saving dataset bytes;
-- full-inventory and selected-file capacity plans that compare exact API bytes with the destination filesystem;
+- full-inventory and selected-file capacity plans that compare exact API bytes with the destination filesystem while presenting rounded approximate MB, GB, or TB summaries to users;
 - hard-minimum workspace calculation for temporary transfer and final files, plus a larger recommendation for ZIP extraction and model outputs;
 - structured file inventory from dataset detail metadata;
 - exact file-key validation and size previews;

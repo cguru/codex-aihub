@@ -23,9 +23,9 @@ Use the bundled tools to discover data, verify full-data access, inspect exact f
 
    Include the returned dataset URL, then stop. Do not download a sample, propose a sample fallback, or create the requested training/evaluation/inference program.
 3. If the API key is missing, direct the user to the official issuance page and stop until the key is configured.
-4. After approval is confirmed, resolve a prospective new absolute destination in the user's workspace or use the user's supplied destination. Call `check_download_capacity` without `file_ids` to compare the exact full inventory with that filesystem. Report exact bytes, decimal TB/GB, binary TiB/GiB, hard minimum, recommendation, available space, and shortfall. Omitting `file_ids` estimates all files but never authorizes a full download.
+4. After approval is confirmed, resolve a prospective new absolute destination in the user's workspace or use the user's supplied destination. Call `check_download_capacity` without `file_ids` to compare the exact full inventory with that filesystem. Report download size, hard minimum, recommendation, available space, and shortfall as rounded approximate MB, GB, or TB values such as `약 590GB` or `약 2.5TB`. Keep the exact byte values for calculations and show them only when the user explicitly asks for exact figures. Omitting `file_ids` estimates all files but never authorizes a full download.
 5. If the full dataset does not fit, say so before file selection. Do not attempt a full download. Offer to identify the smallest task-sufficient subset or ask for a different drive.
-6. Call `list_dataset_files` and report the selected names, file keys, exact sizes, total size, destination, and dataset URL.
+6. Call `list_dataset_files` and report the selected names, exact file keys, approximate human-readable sizes, total size, destination, and dataset URL. Show exact byte sizes only when the user requests them.
 7. Never select every file by default. Choose only files needed for the requested task, and obtain clarification when the correct paired training/validation source and label files cannot be determined safely.
 8. Call `check_download_capacity` again with the exact selected `file_ids`. Stop when `minimumFits` is false. When only `recommendedFits` is false, warn that later ZIP extraction and training outputs may not fit and obtain confirmation or another destination.
 9. Treat an explicit download request for resolved files as sufficient intent. Pass the same new absolute destination directory to `download_dataset_files`; never overwrite an existing path.
@@ -61,8 +61,9 @@ If browser control is unavailable, give the dataset URL and ask the user to down
 
 - State the full match count and the number shown when a search returns a page.
 - Include each relevant AI Hub dataset URL.
-- Show human-readable sizes alongside exact byte counts.
-- Distinguish decimal TB/GB from binary TiB/GiB and clearly label page estimates versus API inventory totals.
+- Normally show sizes as rounded approximate decimal values such as `약 590GB` or `약 2.5TB`.
+- Keep exact byte counts in tool data for safe calculations; include them in the conversation only when the user explicitly asks for exact figures.
+- Clearly label page estimates versus API inventory totals.
 - Preserve uncertainty when a field is absent or the upstream response has changed.
 - Explain that this is an unofficial community integration when affiliation could be misunderstood.
 

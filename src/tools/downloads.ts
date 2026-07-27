@@ -81,7 +81,7 @@ export function registerDownloadTools(
     {
       title: "Check AI Hub download capacity",
       description:
-        "Compare the exact AI Hub API file inventory size with free space on the filesystem that will contain a prospective absolute destination. Omit file_ids to estimate the entire dataset without selecting it for download, or pass exact file IDs to check a selected subset. Returns the hard minimum used by the safe downloader and a larger recommendation for later ZIP extraction and work products. Call after full-data download approval is confirmed and again after exact files are selected. This tool writes nothing.",
+        "Compare the exact AI Hub API file inventory size with free space on the filesystem that will contain a prospective absolute destination. Omit file_ids to estimate the entire dataset without selecting it for download, or pass exact file IDs to check a selected subset. Structured byte values stay exact for safe calculations, while the user-facing summary rounds them to an approximate MB, GB, or TB value. Returns the hard minimum used by the safe downloader and a larger recommendation for later ZIP extraction and work products. Call after full-data download approval is confirmed and again after exact files are selected. This tool writes nothing.",
       inputSchema: {
         dataset_id: z
           .number()
@@ -277,10 +277,10 @@ function capacityMessage(result: {
   destinationExists: boolean;
 }): string {
   const prefix =
-    `예상 다운로드 ${formatBytes(result.downloadBytes)}, ` +
-    `최소 여유 공간 ${formatBytes(result.minimumFreeBytes)}, ` +
-    `권장 여유 공간 ${formatBytes(result.recommendedFreeBytes)}, ` +
-    `현재 사용 가능 ${formatBytes(result.availableBytes)}입니다. `;
+    `예상 다운로드 ${formatApproximateBytes(result.downloadBytes)}, ` +
+    `최소 여유 공간 ${formatApproximateBytes(result.minimumFreeBytes)}, ` +
+    `권장 여유 공간 ${formatApproximateBytes(result.recommendedFreeBytes)}, ` +
+    `현재 사용 가능 ${formatApproximateBytes(result.availableBytes)}입니다. `;
   const existing = result.destinationExists
     ? "지정한 목적 경로가 이미 있어 실제 다운로드에는 새 경로가 필요합니다. "
     : "";
@@ -289,7 +289,7 @@ function capacityMessage(result: {
     return (
       prefix +
       existing +
-      `최소 공간이 ${formatBytes(result.minimumShortfallBytes)} 부족하므로 이 대상으로는 다운로드할 수 없습니다.`
+      `최소 공간이 ${formatApproximateBytes(result.minimumShortfallBytes)} 부족하므로 이 대상으로는 다운로드할 수 없습니다.`
     );
   }
   if (!result.recommendedFits) {
@@ -302,17 +302,18 @@ function capacityMessage(result: {
   return prefix + existing + "다운로드와 후속 작업을 위한 권장 공간을 충족합니다.";
 }
 
-function formatBytes(bytes: number): string {
+export function formatApproximateBytes(bytes: number): string {
+  const formatter = new Intl.NumberFormat("ko-KR", {
+    maximumSignificantDigits: 2,
+  });
+
   if (bytes < 1_000_000_000) {
-    return `${(bytes / 1_000_000).toFixed(2)} MB`;
+    return `약 ${formatter.format(bytes / 1_000_000)}MB`;
   }
   if (bytes < 1_000_000_000_000) {
-    return `${(bytes / 1_000_000_000).toFixed(2)} GB`;
+    return `약 ${formatter.format(bytes / 1_000_000_000)}GB`;
   }
-  return (
-    `${(bytes / 1_000_000_000_000).toFixed(2)} TB` +
-    ` (${(bytes / 1_099_511_627_776).toFixed(2)} TiB)`
-  );
+  return `약 ${formatter.format(bytes / 1_000_000_000_000)}TB`;
 }
 
 async function runTool<T extends object>(
