@@ -2,7 +2,7 @@
 
 `codex-aihub`는 Codex에서 자연어로 [AI Hub](https://aihub.or.kr/) 데이터셋을 검색하고 메타데이터를 확인할 수 있게 해 주는 비공식 오픈소스 플러그인입니다.
 
-현재 `0.1.1` 버전은 데이터셋 검색·개수 확인·상세 정보 조회만 지원합니다. 데이터 파일 목록 조회와 다운로드 기능은 아직 포함되어 있지 않습니다.
+현재 `0.1.2` 버전은 데이터셋 검색·개수 확인·상세 정보 조회만 지원합니다. 데이터 파일 목록 조회와 다운로드 기능은 아직 포함되어 있지 않습니다.
 
 ## 가장 쉬운 설치 방법: Codex에게 맡기기
 
@@ -13,8 +13,10 @@ Codex에 아래 메시지를 그대로 보내세요.
 https://github.com/cguru/codex-aihub
 
 이 저장소를 플러그인 마켓플레이스로 추가하고 codex-aihub를 설치해줘.
-AIHUB_API_KEY가 없으면 키를 채팅으로 받지 말고, 공식 발급 페이지와
-내 운영체제에 맞는 안전한 로컬 환경변수 설정 방법을 안내해줘.
+AIHUB_API_KEY가 없으면 키를 채팅으로 받지 말고 공식 발급 페이지를 안내해줘.
+내가 로컬 키 파일의 경로를 알려주면 키 값을 화면에 출력하지 말고,
+파일에서 실제 키만 읽어 Windows 사용자 환경변수 AIHUB_API_KEY에 등록해줘.
+파일이 "AIHUB_KEY=키" 또는 "AIHUB_API_KEY=키" 형식이면 등호 뒤의 값만 등록해줘.
 설치 후 새 Codex 작업에서 시험할 질문도 알려줘.
 ```
 
@@ -38,21 +40,82 @@ codex plugin add codex-aihub@codex-aihub
 
 설치 후 Codex를 다시 시작하거나 새 작업을 여세요.
 
-## AI Hub API 키 준비하기
+## AI Hub API 키 등록하기
 
 1. [AI Hub 공식 API 안내·키 발급 페이지](https://aihub.or.kr/devsport/apishell/list.do)에 로그인합니다.
-2. 안내에 따라 개인 API 키를 발급받습니다.
+2. **API key 발급**을 누르고 메일로 받은 개인 키를 확인합니다.
 3. Windows 시작 메뉴에서 **환경 변수 편집**을 검색해 엽니다.
 4. **사용자 변수**에 새 변수를 추가합니다.
    - 변수 이름: `AIHUB_API_KEY`
-   - 변수 값: 발급받은 개인 API 키
+   - 변수 값: 메일의 `APIKEY` 오른쪽에 표시된 값만 입력
 5. 실행 중인 Codex를 완전히 종료한 뒤 다시 시작합니다.
+
+환경변수의 **이름**은 `AIHUB_API_KEY`이고, **값**에는 실제 키만 들어가야 합니다.
+
+| 입력 위치 | 올바른 값 |
+| --- | --- |
+| 변수 이름 | `AIHUB_API_KEY` |
+| 변수 값 | 메일에서 받은 APIKEY 값만 입력 |
+
+변수 값에 `AIHUB_KEY=`나 `AIHUB_API_KEY=`를 붙이거나 따옴표로 감싸지 마세요. `AIHUB_API_KEY=발급받은-키` 전체를 변수 값에 넣는 것은 잘못된 등록입니다.
+
+### 키 파일에서 안전하게 등록하기
+
+키 파일은 저장소 밖의 개인 폴더에 두세요. 파일 내용은 다음 두 형식 중 하나만 사용합니다.
+아래의 `발급받은-키`는 자리표시자입니다. 이 글자를 그대로 복사하지 말고 메일의 `APIKEY` 오른쪽 값을 넣으세요.
+
+```text
+발급받은-키
+```
+
+또는
+
+```text
+AIHUB_API_KEY=발급받은-키
+```
+
+아래 PowerShell 블록을 **그대로 실행**하면 키 파일 경로만 물어봅니다. 키 값은 화면이나 명령 기록에 출력하지 않으며, 두 파일 형식을 모두 처리해 실제 키만 Windows 사용자 환경변수에 저장합니다.
+
+```powershell
+& {
+  param([Parameter(Mandatory)][string]$KeyPath)
+
+  $KeyPath = $KeyPath.Trim().Trim('"').Trim("'")
+  $key = (Get-Content -Raw -LiteralPath $KeyPath).Trim()
+  if ($key -match '^(?:AIHUB_API_KEY|AIHUB_KEY)\s*=\s*(.+)$') {
+    $key = $Matches[1].Trim()
+  }
+  if ($key -notmatch '^[0-9A-Fa-f]{8}-(?:[0-9A-Fa-f]{4}-){3}[0-9A-Fa-f]{12}$') {
+    throw '키 파일에서 올바른 AI Hub API 키를 찾지 못했습니다.'
+  }
+
+  [Environment]::SetEnvironmentVariable('AIHUB_API_KEY', $key, 'User')
+} (Read-Host 'AI Hub API 키 파일의 전체 경로')
+
+Write-Host '등록 완료: Codex를 완전히 종료한 뒤 다시 시작하세요.'
+```
+
+키 파일을 만드는 것만으로는 플러그인이 자동으로 읽지 않습니다. 위 절차로 `AIHUB_API_KEY` 사용자 환경변수에 등록해야 합니다.
+
+등록 여부만 확인하려면 다음 명령을 사용하세요. 키 값은 출력하지 않습니다.
+
+```powershell
+if ([string]::IsNullOrWhiteSpace(
+  [Environment]::GetEnvironmentVariable('AIHUB_API_KEY', 'User')
+)) {
+  '등록되지 않음'
+} else {
+  '등록됨'
+}
+```
 
 일시적으로 현재 PowerShell 창에서만 시험하려면 아래처럼 설정할 수도 있습니다. 이 창에서 Codex를 실행해야 값이 전달됩니다.
 
 ```powershell
 $env:AIHUB_API_KEY = "발급받은-개인-키"
 ```
+
+위 명령의 따옴표는 PowerShell 문법이며 환경변수 값에 포함되지 않습니다.
 
 키 값을 채팅에 보내 설치를 맡기는 방식은 권장하지 않습니다. Codex에게는 발급 페이지를 열어 달라고 하거나, 운영체제에 맞는 환경변수 설정 절차만 안내해 달라고 하세요.
 

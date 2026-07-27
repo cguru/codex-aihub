@@ -1,6 +1,6 @@
 {
   "name": "codex-aihub",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Codex에서 AI Hub 데이터셋 메타데이터를 검색하고 확인합니다.",
   "homepage": "https://github.com/cguru/codex-aihub#readme",
   "repository": "https://github.com/cguru/codex-aihub",

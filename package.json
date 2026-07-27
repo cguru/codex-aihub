@@ -1,6 +1,6 @@
 {
   "name": "codex-aihub",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Local MCP server for searching and inspecting AI Hub dataset metadata from Codex.",
   "type": "module",
   "license": "MIT",

@@ -27,6 +27,15 @@ describe("loadConfig", () => {
     });
   });
 
+  it("recovers the key value from common copied assignment forms", () => {
+    expect(loadConfig({ AIHUB_API_KEY: 'AIHUB_KEY="fake-key"' }).apiKey).toBe(
+      "fake-key",
+    );
+    expect(
+      loadConfig({ AIHUB_API_KEY: "AIHUB_API_KEY='other-fake-key'" }).apiKey,
+    ).toBe("other-fake-key");
+  });
+
   it("rejects unsafe schemes and out-of-range timeouts", () => {
     expect(() =>
       loadConfig({

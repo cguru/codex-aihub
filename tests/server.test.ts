@@ -15,7 +15,7 @@ describe("MCP server", () => {
     const server = createAihubServer();
     const client = new Client({
       name: "codex-aihub-test",
-      version: "0.1.1",
+      version: "0.1.2",
     });
     closeCallbacks.push(async () => {
       await client.close();

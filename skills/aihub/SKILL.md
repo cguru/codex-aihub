@@ -23,7 +23,8 @@ Use the bundled read-only metadata tools to answer dataset discovery questions.
 
 ## Protect access and data
 
-- Never ask the user to paste `AIHUB_API_KEY` into the conversation. If it is missing, direct them to the official issuance page at `https://aihub.or.kr/devsport/apishell/list.do`, explain how to set it as a local environment variable on their operating system, and ask them to restart Codex.
+- Never ask the user to paste `AIHUB_API_KEY` into the conversation. If it is missing, direct them to the official issuance page at `https://aihub.or.kr/devsport/apishell/list.do`. Clearly distinguish the environment-variable name (`AIHUB_API_KEY`) from its value (only the APIKEY value shown in the issuance email), then ask the user to restart Codex after registration.
+- If the user explicitly provides a local key-file path and asks Codex to register it, read it locally without echoing its contents. Accept either a raw key or a single `AIHUB_API_KEY=<key>` / `AIHUB_KEY=<key>` assignment, register only the value as the user's `AIHUB_API_KEY`, verify presence without printing the value, and never copy the key into a prompt, source file, `.mcp.json`, or log.
 - Never expose the key in tool results, logs, URLs, or error messages.
 - Do not imply that metadata visibility grants download approval or dataset reuse rights.
 - Do not download data unless the user explicitly requests it and a future download tool is available. This version exposes metadata tools only.

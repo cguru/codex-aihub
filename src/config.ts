@@ -14,7 +14,7 @@ const MAX_TIMEOUT_MS = 120_000;
 export function loadConfig(
   env: NodeJS.ProcessEnv = process.env,
 ): AihubConfig {
-  const apiKey = env.AIHUB_API_KEY?.trim();
+  const apiKey = normalizeApiKey(env.AIHUB_API_KEY);
   if (!apiKey) {
     throw new AihubError(
       "AIHUB_API_KEY_MISSING",
@@ -28,6 +28,31 @@ export function loadConfig(
   const timeoutMs = parseTimeout(env.AIHUB_REQUEST_TIMEOUT_MS);
 
   return { apiKey, metadataBaseUrl, timeoutMs };
+}
+
+function normalizeApiKey(value: string | undefined): string | undefined {
+  let normalized = value?.trim();
+  if (!normalized) {
+    return undefined;
+  }
+
+  const assignment = normalized.match(
+    /^(?:AIHUB_API_KEY|AIHUB_KEY)\s*=\s*(.+)$/i,
+  );
+  if (assignment?.[1]) {
+    normalized = assignment[1].trim();
+  }
+
+  const quote = normalized[0];
+  if (
+    normalized.length >= 2 &&
+    (quote === '"' || quote === "'") &&
+    normalized.at(-1) === quote
+  ) {
+    normalized = normalized.slice(1, -1).trim();
+  }
+
+  return normalized || undefined;
 }
 
 function normalizeBaseUrl(value: string): string {
