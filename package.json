@@ -1,7 +1,7 @@
 {
   "name": "codex-aihub",
-  "version": "0.1.2",
-  "description": "Local MCP server for searching and inspecting AI Hub dataset metadata from Codex.",
+  "version": "0.3.0",
+  "description": "Codex plugin for discovering AI Hub datasets and safely downloading selected approved files.",
   "type": "module",
   "license": "MIT",
   "homepage": "https://github.com/cguru/codex-aihub#readme",
@@ -34,10 +34,12 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.29.0",
+    "tar-stream": "^3.2.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/node": "^20.17.0",
+    "@types/tar-stream": "^3.1.4",
     "tsup": "^8.5.1",
     "typescript": "^5.9.3",
     "vitest": "^4.1.10"

@@ -14,14 +14,21 @@ Status: implemented in the initial repository.
 
 ## Milestone 0.2 — file inventory
 
+Status: implemented.
+
 - `list_dataset_files`
+- structured file inventory from dataset details
+- safe size parsing and normalized file identifiers
+
+Still planned:
+
 - `list_data_packages`
 - `list_package_files`
 - `check_api_key`
-- independent parsers for dataset and data-package file trees
-- safe size parsing and normalized file identifiers
 
 ## Milestone 0.3 — controlled downloads
+
+Status: implemented for selected dataset files.
 
 - preview the dataset/package, selected files, estimated size, and destination;
 - require an explicit user download request;
@@ -32,6 +39,12 @@ Status: implemented in the initial repository.
 - validate TAR entries against absolute paths, traversal, and unsafe links;
 - merge `.partN` files in numeric order;
 - preserve incomplete artifacts as incomplete, never as finished files.
+
+Still planned:
+
+- background download jobs and progress reporting for very large files;
+- safe resume across process restarts;
+- data-package downloads.
 
 ## Milestone 1.0 — public release
 

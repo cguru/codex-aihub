@@ -11,6 +11,6 @@ export default defineConfig({
   sourcemap: false,
   clean: true,
   outDir: "dist",
-  noExternal: ["@modelcontextprotocol/sdk", "zod"],
+  noExternal: ["@modelcontextprotocol/sdk", "tar-stream", "zod"],
   outExtension: () => ({ js: ".mjs" }),
 });

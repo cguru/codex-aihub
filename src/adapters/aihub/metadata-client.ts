@@ -15,6 +15,8 @@ import type {
   SearchDatasetsInput,
   SearchDatasetsResult,
 } from "./types.js";
+import { extractDatasetFileInventory } from "../../download/inventory.js";
+import type { DatasetFileInventory } from "../../download/types.js";
 
 const ENDPOINTS = {
   search: "/mcp/dataSetList.do",
@@ -75,6 +77,15 @@ export class AihubMetadataClient {
       AUDIT_TOOLS.detail,
     );
     return extractDetail(envelope, ENDPOINTS.detail);
+  }
+
+  async getDatasetFileInventory(
+    id: number,
+  ): Promise<DatasetFileInventory | null> {
+    const dataset = await this.getDataset(id);
+    return dataset === null
+      ? null
+      : extractDatasetFileInventory(id, dataset);
   }
 
   async getDatasetsWithGuide(

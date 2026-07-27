@@ -6,7 +6,10 @@ import { AihubError } from "../src/errors.js";
 const fakeConfig: AihubConfig = {
   apiKey: "fake-test-key",
   metadataBaseUrl: "https://example.test",
+  downloadBaseUrl: "https://download.example.test",
+  downloadVersion: "0.6",
   timeoutMs: 5_000,
+  downloadTimeoutMs: 60_000,
 };
 
 describe("AihubMetadataClient", () => {

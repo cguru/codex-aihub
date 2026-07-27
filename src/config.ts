@@ -3,13 +3,20 @@ import { AihubError } from "./errors.js";
 export interface AihubConfig {
   apiKey: string;
   metadataBaseUrl: string;
+  downloadBaseUrl: string;
+  downloadVersion: string;
   timeoutMs: number;
+  downloadTimeoutMs: number;
 }
 
 const DEFAULT_METADATA_BASE_URL = "https://aihub.or.kr";
+const DEFAULT_DOWNLOAD_BASE_URL = "https://api.aihub.or.kr";
+const DEFAULT_DOWNLOAD_VERSION = "0.6";
 const DEFAULT_TIMEOUT_MS = 20_000;
+const DEFAULT_DOWNLOAD_TIMEOUT_MS = 3_600_000;
 const MIN_TIMEOUT_MS = 1_000;
 const MAX_TIMEOUT_MS = 120_000;
+const MAX_DOWNLOAD_TIMEOUT_MS = 86_400_000;
 
 export function loadConfig(
   env: NodeJS.ProcessEnv = process.env,
@@ -24,10 +31,34 @@ export function loadConfig(
 
   const metadataBaseUrl = normalizeBaseUrl(
     env.AIHUB_METADATA_BASE_URL ?? DEFAULT_METADATA_BASE_URL,
+    "AIHUB_METADATA_BASE_URL",
   );
-  const timeoutMs = parseTimeout(env.AIHUB_REQUEST_TIMEOUT_MS);
+  const downloadBaseUrl = normalizeBaseUrl(
+    env.AIHUB_DOWNLOAD_BASE_URL ?? DEFAULT_DOWNLOAD_BASE_URL,
+    "AIHUB_DOWNLOAD_BASE_URL",
+  );
+  const downloadVersion = parseDownloadVersion(env.AIHUB_DOWNLOAD_VERSION);
+  const timeoutMs = parseTimeout(
+    env.AIHUB_REQUEST_TIMEOUT_MS,
+    "AIHUB_REQUEST_TIMEOUT_MS",
+    MAX_TIMEOUT_MS,
+    DEFAULT_TIMEOUT_MS,
+  );
+  const downloadTimeoutMs = parseTimeout(
+    env.AIHUB_DOWNLOAD_TIMEOUT_MS,
+    "AIHUB_DOWNLOAD_TIMEOUT_MS",
+    MAX_DOWNLOAD_TIMEOUT_MS,
+    DEFAULT_DOWNLOAD_TIMEOUT_MS,
+  );
 
-  return { apiKey, metadataBaseUrl, timeoutMs };
+  return {
+    apiKey,
+    metadataBaseUrl,
+    downloadBaseUrl,
+    downloadVersion,
+    timeoutMs,
+    downloadTimeoutMs,
+  };
 }
 
 function normalizeApiKey(value: string | undefined): string | undefined {
@@ -55,14 +86,14 @@ function normalizeApiKey(value: string | undefined): string | undefined {
   return normalized || undefined;
 }
 
-function normalizeBaseUrl(value: string): string {
+function normalizeBaseUrl(value: string, variableName: string): string {
   let parsed: URL;
   try {
     parsed = new URL(value);
   } catch (cause) {
     throw new AihubError(
       "AIHUB_INVALID_CONFIG",
-      "AIHUB_METADATA_BASE_URL이 올바른 URL이 아닙니다.",
+      `${variableName}이 올바른 URL이 아닙니다.`,
       { cause },
     );
   }
@@ -70,7 +101,7 @@ function normalizeBaseUrl(value: string): string {
   if (parsed.protocol !== "https:" && parsed.protocol !== "http:") {
     throw new AihubError(
       "AIHUB_INVALID_CONFIG",
-      "AIHUB_METADATA_BASE_URL은 http 또는 https URL이어야 합니다.",
+      `${variableName}은 http 또는 https URL이어야 합니다.`,
     );
   }
 
@@ -80,16 +111,32 @@ function normalizeBaseUrl(value: string): string {
   return parsed.toString().replace(/\/$/, "");
 }
 
-function parseTimeout(value: string | undefined): number {
+function parseDownloadVersion(value: string | undefined): string {
+  const normalized = value?.trim() || DEFAULT_DOWNLOAD_VERSION;
+  if (!/^\d+(?:\.\d+){1,2}$/.test(normalized)) {
+    throw new AihubError(
+      "AIHUB_INVALID_CONFIG",
+      "AIHUB_DOWNLOAD_VERSION은 0.6과 같은 숫자 버전이어야 합니다.",
+    );
+  }
+  return normalized;
+}
+
+function parseTimeout(
+  value: string | undefined,
+  variableName: string,
+  max: number,
+  defaultValue: number,
+): number {
   if (value === undefined || value.trim() === "") {
-    return DEFAULT_TIMEOUT_MS;
+    return defaultValue;
   }
 
   const parsed = Number(value);
-  if (!Number.isInteger(parsed) || parsed < MIN_TIMEOUT_MS || parsed > MAX_TIMEOUT_MS) {
+  if (!Number.isInteger(parsed) || parsed < MIN_TIMEOUT_MS || parsed > max) {
     throw new AihubError(
       "AIHUB_INVALID_CONFIG",
-      `AIHUB_REQUEST_TIMEOUT_MS는 ${MIN_TIMEOUT_MS}~${MAX_TIMEOUT_MS} 사이의 정수여야 합니다.`,
+      `${variableName}는 ${MIN_TIMEOUT_MS}~${max} 사이의 정수여야 합니다.`,
     );
   }
   return parsed;

@@ -23,7 +23,10 @@ describe("loadConfig", () => {
     expect(loadConfig({ AIHUB_API_KEY: "  fake-key  " })).toEqual({
       apiKey: "fake-key",
       metadataBaseUrl: "https://aihub.or.kr",
+      downloadBaseUrl: "https://api.aihub.or.kr",
+      downloadVersion: "0.6",
       timeoutMs: 20_000,
+      downloadTimeoutMs: 3_600_000,
     });
   });
 
@@ -50,5 +53,19 @@ describe("loadConfig", () => {
         AIHUB_REQUEST_TIMEOUT_MS: "999",
       }),
     ).toThrow(/1000~120000/);
+
+    expect(() =>
+      loadConfig({
+        AIHUB_API_KEY: "fake-key",
+        AIHUB_DOWNLOAD_BASE_URL: "file:///tmp/api",
+      }),
+    ).toThrow(/AIHUB_DOWNLOAD_BASE_URL/);
+
+    expect(() =>
+      loadConfig({
+        AIHUB_API_KEY: "fake-key",
+        AIHUB_DOWNLOAD_VERSION: "latest",
+      }),
+    ).toThrow(/숫자 버전/);
   });
 });

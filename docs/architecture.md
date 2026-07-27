@@ -6,7 +6,7 @@
 - Read `AIHUB_API_KEY` only from the local process environment.
 - Keep unstable AI Hub HTTP contracts behind one adapter boundary.
 - Return concise structured results without exposing credentials or complete raw error bodies.
-- Keep metadata discovery read-only and make future downloads explicit write operations.
+- Keep metadata discovery read-only and make downloads explicit, selected write operations.
 
 ## Current flow
 
@@ -14,8 +14,10 @@
 Codex
   └─ plugin skill + MCP tools
        └─ dist/server.mjs (stdio, Node.js 20+)
-            └─ src/adapters/aihub
-                 └─ https://aihub.or.kr/mcp/*.do
+            ├─ src/adapters/aihub/metadata-client
+            │    └─ https://aihub.or.kr/mcp/*.do
+            └─ src/download + download-client
+                 └─ https://api.aihub.or.kr/down/{version}/{dataset}.do
 ```
 
 The plugin root contains `.codex-plugin/plugin.json`, `.mcp.json`, and the `aihub` skill. `.mcp.json` starts `node ./dist/server.mjs --stdio` with the plugin root as its working directory and forwards only named environment variables.
@@ -24,7 +26,7 @@ The plugin root contains `.codex-plugin/plugin.json`, `.mcp.json`, and the `aihu
 
 ### MCP layer
 
-`src/tools` owns user-facing names, schemas, descriptions, output summaries, and safety annotations. All current tools declare `readOnlyHint: true`, `destructiveHint: false`, and `idempotentHint: true`.
+`src/tools` owns user-facing names, schemas, descriptions, output summaries, and safety annotations. Metadata and file inventory tools are read-only. `download_dataset_files` is a non-destructive write operation and requires explicit file keys plus a new absolute destination.
 
 ### AI Hub adapter
 
@@ -56,6 +58,16 @@ The AI Hub metadata endpoints are not stable public contracts. Parsers therefore
 
 Synthetic contract tests capture the currently observed envelope without incorporating AI Hub source code or real dataset files.
 
-## Planned download architecture
+## Download architecture
 
-Download support will be added separately under `src/download` and `src/security`. It must include a preview/confirmation boundary, collision-safe destinations, resumable temporary files, disk-space checks, TAR path traversal checks, symlink rejection, numeric `.partN` ordering, and atomic finalization. Download tools must not be marked read-only.
+`src/download` implements:
+
+- structured file inventory from dataset detail metadata;
+- exact file-key validation and size previews;
+- collision-safe destinations and disk-space checks;
+- bounded temporary TAR downloads;
+- path traversal, absolute path, and link rejection;
+- numeric `.partN` merging;
+- atomic destination finalization and temporary cleanup.
+
+The lightweight sample link is not part of this API-key download path. It is rendered only for an authenticated AI Hub web session, so the bundled skill uses an available signed-in browser for sample downloads and never asks for cookies.

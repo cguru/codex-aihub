@@ -16,6 +16,7 @@ AI Hub stated, in substance, that:
 - Development and publication do not require a separate AI Hub license or approval, and remain the developer's responsibility.
 - The endpoints are not guaranteed public API specifications and may change or stop without prior notice.
 - Downloads require each user's normal dataset approval and personal API key.
+- Lightweight sample downloads are exposed separately through the signed-in AI Hub website and do not use the API-key download endpoint.
 - Downloaded data remains subject to AI Hub restrictions, including rules concerning third-party provision, overseas transfer, and redistribution.
 
 ## Project interpretation
@@ -27,6 +28,7 @@ The project will:
 - use only synthetic API responses and fake keys in committed tests;
 - keep real downloaded data out of source control, releases, and fixtures;
 - avoid features that bypass approval or facilitate dataset redistribution;
+- keep lightweight-sample browser access separate from approved API file downloads;
 - treat the plugin's MIT license as applying only to this repository's original source code.
 
 ## Public notice
