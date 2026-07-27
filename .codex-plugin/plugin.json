@@ -1,0 +1,32 @@
+{
+  "name": "codex-aihub",
+  "version": "0.1.0",
+  "description": "Search and inspect AI Hub dataset metadata from Codex through a local MCP server.",
+  "author": {
+    "name": "codex-aihub contributors"
+  },
+  "license": "MIT",
+  "keywords": [
+    "aihub",
+    "dataset",
+    "mcp",
+    "korea"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "AI Hub for Codex",
+    "shortDescription": "Search AI Hub datasets from Codex.",
+    "longDescription": "Search, count, and inspect AI Hub dataset metadata with a local Node.js MCP server. Credentials remain in local environment variables.",
+    "developerName": "codex-aihub contributors",
+    "category": "Productivity",
+    "capabilities": [
+      "Read"
+    ],
+    "defaultPrompt": [
+      "Find AI Hub datasets related to Korean speech.",
+      "Count AI Hub datasets in the healthcare field.",
+      "Show the details for an AI Hub dataset."
+    ]
+  },
+  "mcpServers": "./.mcp.json"
+}

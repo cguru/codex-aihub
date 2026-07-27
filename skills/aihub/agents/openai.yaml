@@ -1,0 +1,4 @@
+interface:
+  display_name: "AI Hub"
+  short_description: "Search approved AI Hub datasets safely"
+  default_prompt: "Use $aihub to find AI Hub datasets for my task."

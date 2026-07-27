@@ -1,0 +1,41 @@
+{
+  "name": "codex-aihub",
+  "version": "0.1.0",
+  "description": "Local MCP server for searching and inspecting AI Hub dataset metadata from Codex.",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "files": [
+    ".codex-plugin/",
+    ".mcp.json",
+    "dist/",
+    "docs/",
+    "skills/",
+    "LICENSE",
+    "README.md",
+    "SECURITY.md"
+  ],
+  "scripts": {
+    "build": "tsup && node scripts/normalize-bundle.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "check": "npm run typecheck && npm test && npm run build"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.29.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.17.0",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.10"
+  },
+  "overrides": {
+    "@hono/node-server": "^2.0.5",
+    "esbuild": "^0.28.1"
+  }
+}
